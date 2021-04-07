@@ -1,0 +1,17 @@
+~*.*
+*/.ipynb_checkpoints/
+.vscode/
+.ipynb_checkpoints/
+__pycache__/
+__pycache__/*
+__pycache__/lib.cpython-38.pyc
+*.pyc
+.ipynb/
+.*/
+_*/
+*.pyc
+env/
+classwork/__pycache__/
+classwork/mathSym/__pycache__/
+static/
+config.py

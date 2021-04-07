@@ -1,0 +1,101 @@
+{% extends "mathsym/base.html" %}
+
+{% block content %}
+<script
+    src="https://themes.getbootstrap.com/wp-content/themes/bootstrap-marketplace/assets/javascript/jquery.min.js"></script>
+<style>
+    td {
+        padding-right: 30px
+    }
+</style>
+<script>
+    function onoff(cid) {
+        var x = document.getElementById(cid);
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+    function show_AnsMsgbox() {
+
+        var table = document.getElementById("AnsMsgResTable");
+        alert("上載成績.處理中..請等待..!");
+        let tabData = [];
+        for (var i = 0, row_; row_ = table.rows[i]; i++) {
+            tabData[i] = [];
+            for (var j = 0, col_; col_ = row_.cells[j]; j++) {
+                tabData[i][j] = col_.innerText
+            }
+        }
+        ft = document.getElementById("title").innerHTML.split(".")[0];
+        let d = new Date();
+        let yy = d.getFullYear(); let mm = d.getMonth() + 1; let dd = d.getDate();
+        let HH = d.getHours(); let MM = d.getMinutes(); let SS = d.getSeconds();
+        let md = `${yy}${mm < 10 ? "0" : ""}${mm}${dd < 10 ? "0" : ""}${dd}${HH < 10 ? "0" : ""}${HH}${MM < 10 ? "0" : ""}${MM}${SS < 10 ? "0" : ""}${SS}`;
+        tabData = JSON.stringify(tabData);
+        $.post("/internal/TMS/AddTMSQF", { "fn": "" + ft + "_0_" + md, "data": tabData },  //"fileid": "$('#FileId').val()",
+            function (data) {
+                alert(data);
+                onoff("post_btn");
+                onoff("return_btn");
+            });
+    }      
+</script>
+<h3 id="title">{{title}}</h3>
+<div style="  margin: auto;width: 80%;">
+    <table id="AnsMsgResTable">
+        <tr>
+            <td>題型</td>
+            <td>題號</td>
+            <td>對/錯"</td>
+            <td>耗時</td>
+            <td>得分</td>
+            <td>命題</td>
+            <td>解題</td>
+            <td>標準答案</td>
+        </tr>
+        {% for TE in NTE %}
+        <tr>
+            <td>{{TE.Tx}}</td>
+            <td>{{TE.Id}}</td>
+            <td>
+                <div>{{TE.OK}}</div>
+            </td>
+            <td>{{TE.Minute}}</td>
+            <td>
+                <div>{{TE.OK}}</div>
+            </td>
+            <td>
+                {% if TE.St is iterable and TE.St is not string %}
+                {% for St1 in TE.St %}
+                <div> \[{{St1|safe}}\]</div>
+                {% endfor %}
+
+                {% else %}
+                <div> \[{{TE.St|safe}}\]</div>
+                {% endif %}
+            </td>
+            <td>
+                <div>{{TE.Ans}}</div>
+            </td>
+            <td>
+                {% if TE.Val is iterable and TE.Val is not string %}
+                {% for Val1 in TE.Val %}
+                <div>{{Val1}}</div>
+                {% endfor %}
+                {% else %}
+                <div>{{TE.Val}}</div>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a id="post_btn" href=# class="btn btn-success btn-sm" onclick="show_AnsMsgbox();" style="display: block;">
+        儲存作答成績
+    </a>
+    <a id="return_btn" href="/mathsym/apps" class="btn btn-success btn-sm" style="display: none;">
+        返回
+    </a>
+</div>
+{% endblock %}

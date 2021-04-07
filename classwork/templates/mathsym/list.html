@@ -1,0 +1,22 @@
+{% extends "mathsym/base.html" %}
+
+{% block content %}
+
+<h3>List</h3>
+
+{% for book in books %}
+<div class="media">
+  <a href="/mathsym/apps/{{book}}">
+    <span>{{book}}</span>
+  </a>
+  <small>題型</small>
+  {% set QID,TX,Name = book.split('.') %}
+  {% for n in range(0,TX|int) %}
+  <a href="/mathsym/apps/{{book}}?Tx={{n}}">[{{n}}]</a>
+  {% endfor %}
+</div>
+{% else %}
+<p>No books found</p>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "mathsym/base.html" %}
+
+{% block content %}
+
+<script>
+
+
+
+  $(document).ready(function () {
+    $('#formid').on('keyup keypress', function (e) {
+      var keyCode = e.keyCode || e.which;
+      if (keyCode === 13) {
+        e.preventDefault();
+        return false;
+      }
+    });
+  });
+
+
+  function MSTime() {
+    let d = new Date();
+    let m = d.getMinutes();
+    let s = d.getSeconds();
+    return (m < 10 ? `0${m}` : `${m}`) + (s < 10 ? `:0${s}` : `:${s}`)
+  }
+  function spend_Time(x) {
+    let a_=x.split(":")
+    let m_=Number(a_[0])
+    let s_=Number(a_[1])
+    let ms_=m_*60+s_
+    let d = new Date();
+    let m = d.getMinutes();
+    let s = d.getSeconds();
+    let ms=m*60+s
+    let c=ms-ms_;
+    if(c<0) c=c+3600
+    m=Math.floor(c / 60)
+    s=c % 60
+    return c;// (m < 10 ? `0${m}` : `${m}`) + (s < 10 ? `:0${s}` : `:${s}`)
+  }
+
+  function formSubmit(cid) {
+    var t = document.getElementById("T" + cid);  t.value=spend_Time(t.value)    
+    document.getElementById('formid').submit();
+  }
+
+  function showCtx(cid) {
+    var t = document.getElementById("T" + cid);  t.value=spend_Time(t.value)    
+    var x = document.getElementById("content" + cid);
+    x.style.display = x.style.display === "none" ? "block" : "none";
+    for (let i = 1; i < 8; i++) {
+      t = document.getElementById("T" + (cid + i));  if(t !==null) t.value=MSTime()
+      x = document.getElementById("content" + (cid + i));
+      if (x !== null) {
+        x.style.display = x.style.display === "none" ? "block" : "none";
+        break;
+      }
+    }
+  }
+</script>
+
+<h3>{{title}}</h3>
+<div style="margin: auto;width: 60%;">
+  <form id="formid" method="POST">
+    <P>
+      <input name="SID" type="hidden" value="{{sid}}">
+    </P>
+    {% for TE in NTE %}
+    {% if loop.previtem is defined %}
+    {% set display_style = "display:none" %}
+    {% else %}
+    {% set display_style = "display:block" %}
+    {% endif %}
+    <div id="content{{TE.Id}}" style="{{display_style}}">
+      <span>題目{{TE.Id+1}}:</span>
+      {% if TE.St is iterable and TE.St is not string %}
+
+      {% for St1 in TE.St %}
+      <div> \[{{St1|safe}}\]</div>
+      {% endfor %}
+
+      {% else %}
+      <div> \[{{TE.St|safe}}\]</div>
+      {% endif %}
+      <div>{{TE.Tip}}</div>
+      {% if TE.Val is iterable and TE.Val is not string %}
+      {% for Val1 in TE.Val %}
+      <div>作答:<input name="{{TE.Id}}" autocomplete="off"></div>
+      {% endfor %}
+      {% else %}
+      <div>作答:<input name="{{TE.Id}}" autocomplete="off"></div>
+      {% endif %}
+      <input style="display:none" name="{{TE.Id+1000}}" id="T{{TE.Id}}" value="{{TE.Minute}}">
+      {% if TE.PlotImg %}
+      <img src="/mathsym/apps/img/{{TE.PlotImg}}">
+      {% else %}
+      <p>.</p>
+      {% endif %}
+
+
+      {% if loop.nextitem is defined %}
+
+      <div><a class="btn btn-primary" href=# onclick="showCtx({{TE.Id}})">下一題</a></div>
+      {% else %}
+      <div><input class="btn btn-success" type="button" value="檢查試題"  onclick="formSubmit({{TE.Id}})"></div>
+      {% endif %}
+
+    </div>
+    {% else %}
+    <p>No books found</p>
+    {% endfor %}
+
+  </form>
+</div>
+{% endblock %}
